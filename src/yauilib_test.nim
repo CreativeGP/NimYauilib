@@ -5,7 +5,8 @@
 ### Author: CreativeGP<cretgp.com>
 ###
 
-import sdl2/sdl
+import sdl2/sdl,
+       sdl2/sdl_ttf as ttf
 import geo
 
 const
@@ -29,6 +30,12 @@ proc init(app: App): bool =
     echo "ERROR: Can't initialize SDL: ", sdl.getError()
     return false
 
+    # Init SDL_TTF
+  if ttf.init() != 0:
+    sdl.logCritical(sdl.LogCategoryError,
+                    "Can't initialize SDL_TTF: %s",
+                    ttf.getError())
+
   app.window = sdl.createWindow(
     Title,
     sdl.WindowPosUndefined,
@@ -47,12 +54,28 @@ proc init(app: App): bool =
     return false
 
   # Set draw color
-  if app.renderer.setRenderDrawColor(0xFF, 0xFF, 0xFF, 0xFF) != 0:
+  if app.renderer.setRenderDrawColor(0x00, 0x00, 0x00, 0x00) != 0:
     echo "ERROR: Can't set draw color: ", sdl.getError()
     return false
 
   echo "SDL initialized successfully"
   return true
+
+# Render surface
+proc render(renderer: sdl.Renderer,
+            surface: sdl.Surface, x, y: int): bool =
+  result = true
+  var rect = sdl.Rect(x: x, y: y, w: surface.w, h: surface.h)
+  # Convert to texture
+  var texture = sdl.createTextureFromSurface(renderer, surface)
+  if texture == nil:
+    return false
+  # Render texture
+  if renderer.renderCopy(texture, nil, addr(rect)) == 0:
+    result = false
+  # Clean
+  destroyTexture(texture)
+
 
 proc events(): bool =
   result = false
@@ -88,13 +111,47 @@ proc exit(app: App) =
 var
   app = App(window: nil, renderer: nil)
   done = false
+  pressed: seq[sdl.Keycode] = @[]
 
 if init(app):
+  var
+    font, outlinedFont: ttf.Font
+    textColor = sdl.Color(r: 0xFF, g: 0xFF, b: 0xFF)
+    bgColor = sdl.Color(r: 0x30, g: 0x30, b: 0x30)
 
+  font = ttf.openFont("assets/VeraMono.ttf", 16)
+  if font == nil:
+    sdl.logCritical(sdl.LogCategoryError,
+                    "Can't load font: %s",
+                    ttf.getError())
+    
   while not done:
     # Clear screen with draw color
     if app.renderer.renderClear() != 0:
       echo "Warning: Can't clear screen: ", sdl.getError()
+
+    var s: sdl.Surface
+
+    s = font.renderUTF8_Solid("Solid text", textColor)
+    discard app.renderer.render(s, 10, 10)
+    sdl.freeSurface(s)
+
+    s = font.renderUTF8_Shaded("Shaded text", textColor, bgColor)
+    discard app.renderer.render(s, 10, 30)
+    sdl.freeSurface(s)
+
+    s = font.renderUTF8_Blended("Blended text", textColor)
+    discard app.renderer.render(s, 10, 50)
+    sdl.freeSurface(s)
+
+    s = font.renderUTF8_Blended_Wrapped(
+      "This is really long line of text.", textColor, 150)
+    discard app.renderer.render(s, 10, 90)
+    sdl.freeSurface(s)
+
+    # s = outlinedFont.renderUTF8_Blended("Outlined text", textColor)
+    # discard app.renderer.render(s, 10, 150)
+    # sdl.freeSurface(s)
 
     # Update renderer
     app.renderer.renderPresent()
