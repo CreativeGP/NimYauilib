@@ -1,7 +1,7 @@
 ###
 ### NimYauilib - Yet another UI library for Nim using SDL2 
 ### 
-### 12/03/2018
+### Dec 12 2018
 ### Author: CreativeGP<cretgp.com>
 ###
 
