@@ -6,8 +6,13 @@
 ###
 
 import sdl2/sdl,
-       sdl2/sdl_ttf as ttf
-import geo
+       sdl2/sdl_ttf as ttf,
+       colors
+
+import geo,
+       ui,
+       point,
+       color
 
 const
   Title = "Yauilib Test"
@@ -118,6 +123,7 @@ if init(app):
     font, outlinedFont: ttf.Font
     textColor = sdl.Color(r: 0xFF, g: 0xFF, b: 0xFF)
     bgColor = sdl.Color(r: 0x30, g: 0x30, b: 0x30)
+    point = ui.Point(pos: XY(x:300, y:300), rgba: colorToRGBA(colBlue))
 
   font = ttf.openFont("assets/VeraMono.ttf", 16)
   if font == nil:
@@ -127,6 +133,7 @@ if init(app):
     
   while not done:
     # Clear screen with draw color
+    discard app.renderer.setRenderDrawColor(0,0,0,0)
     if app.renderer.renderClear() != 0:
       echo "Warning: Can't clear screen: ", sdl.getError()
 
@@ -148,6 +155,8 @@ if init(app):
       "This is really long line of text.", textColor, 150)
     discard app.renderer.render(s, 10, 90)
     sdl.freeSurface(s)
+
+    point.draw(app.renderer)
 
     # s = outlinedFont.renderUTF8_Blended("Outlined text", textColor)
     # discard app.renderer.render(s, 10, 150)
