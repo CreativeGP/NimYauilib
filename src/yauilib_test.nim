@@ -12,6 +12,7 @@ import sdl2/sdl,
 import geo,
        ui,
        point,
+       line,
        color
 
 const
@@ -85,8 +86,7 @@ proc render(renderer: sdl.Renderer,
 proc events(): bool =
   result = false
   var e: sdl.Event
-
-  while sdl.pollEvent(addr(e)) != 0:
+  if sdl.pollEvent(addr(e)) != 0:
 
     # Quit requested
     if e.kind == sdl.Quit:
@@ -124,6 +124,7 @@ if init(app):
     textColor = sdl.Color(r: 0xFF, g: 0xFF, b: 0xFF)
     bgColor = sdl.Color(r: 0x30, g: 0x30, b: 0x30)
     point = ui.Point(pos: XY(x:300, y:300), rgba: colorToRGBA(colBlue))
+    line = ui.Line(pos: [XY(x:300, y:300), XY(x:600, y:600)], rgba: colorToRGBA(colGreen)).init
 
   font = ttf.openFont("assets/VeraMono.ttf", 16)
   if font == nil:
@@ -157,6 +158,7 @@ if init(app):
     sdl.freeSurface(s)
 
     point.draw(app.renderer)
+    line.draw(app.renderer)
 
     # s = outlinedFont.renderUTF8_Blended("Outlined text", textColor)
     # discard app.renderer.render(s, 10, 150)
