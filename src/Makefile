@@ -1,8 +1,8 @@
-yaui: yaui.nim
-	nim c yaui.nim
+yauilib_test: yauilib_test.nim
+	nim c yauilib_test.nim
 
-run: yaui
-	./yaui
+test: yauilib_test
+	./yauilib_test
 
 clean:
-	rm yaui
+	rm yauilib_test
