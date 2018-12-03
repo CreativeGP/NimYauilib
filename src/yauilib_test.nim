@@ -6,7 +6,7 @@
 ###
 
 import sdl2/sdl
-
+import geo
 
 const
   Title = "Yauilib Test"
