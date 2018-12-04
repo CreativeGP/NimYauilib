@@ -7,7 +7,9 @@
 
 import sdl2/sdl,
        sdl2/sdl_ttf as ttf,
-       colors
+       colors,
+       os
+       
 
 import geo,
        ui,
@@ -124,7 +126,8 @@ if init(app):
     textColor = sdl.Color(r: 0xFF, g: 0xFF, b: 0xFF)
     bgColor = sdl.Color(r: 0x30, g: 0x30, b: 0x30)
     point = ui.Point(pos: XY(x:300, y:300), rgba: colorToRGBA(colBlue))
-    line = ui.Line(pos: [XY(x:300, y:300), XY(x:600, y:600)], rgba: colorToRGBA(colGreen)).init
+    line = ui.Line(pos: [XY(x:100, y:100), XY(x:0, y:0)], weight: 10, rgba: colorToRGBA(colGreen)).init
+    global_surface = createRGBSurface(0, 800, 600, 32, 0,0,0,0)
 
   font = ttf.openFont("assets/VeraMono.ttf", 16)
   if font == nil:
@@ -163,6 +166,13 @@ if init(app):
     # s = outlinedFont.renderUTF8_Blended("Outlined text", textColor)
     # discard app.renderer.render(s, 10, 150)
     # sdl.freeSurface(s)
+
+#    os.sleep(1000)
+    # var texture = sdl.createTextureFromSurface(app.renderer, global_surface)
+    # var rect = sdl.Rect(x: 0, y: 0, w: 800, h: 600)
+    # discard app.renderer.renderCopy(texture, nil, addr(rect))
+    # destroyTexture(texture)
+
 
     # Update renderer
     app.renderer.renderPresent()
