@@ -54,6 +54,7 @@ type
     pos*: XY
     size*: XY
     rgba*: RGBA
+    border*: bool
   
   Text* = ref object of UI
     pos*: XY
