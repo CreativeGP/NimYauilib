@@ -16,7 +16,8 @@ import geo,
        line,
        color,
        circle,
-       rect
+       rect,
+       text
 
 const
   Title = "Yauilib Test"
@@ -173,6 +174,7 @@ if init(app):
     line = ui.Line(pos: [XY(x:100, y:100), XY(x:0, y:0)], weight: 10, rgba: colorToRGBA(colGreen)).init
     circle = ui.Circle(pos: XY(x:300, y:100), radius: 30, rgba: colorToRGBA(colPink)).init
     rect = ui.Rect(pos: XY(x:10, y:400), size: XY(x:40, y:100), rgba: colorToRGBA(colSkyBlue), border: true).init
+    text = ui.Text(pos: XY(x:100, y:100), val: "hello", point: 32, weight: 1, forergba: colorToRGBA(colRed)).init
     global_surface = createRGBSurface(0, 800, 600, 32, 0,0,0,0)
 
 #  fpsMgr.start()
@@ -212,6 +214,7 @@ if init(app):
     line.draw(app.renderer)
     circle.draw(app.renderer)
     rect.draw(app.renderer)
+    text.draw(app.renderer)
 
     # s = outlinedFont.renderUTF8_Blended("Outlined text", textColor)
     # discard app.renderer.render(s, 10, 150)

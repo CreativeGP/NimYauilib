@@ -59,8 +59,11 @@ type
   Text* = ref object of UI
     pos*: XY
     val*: string
+    font*: ttf.Font
     point*: int
-    rgba*: RGBA
+    weight*: int
+    forergba*: RGBA
+    backrgba*: RGBA
 
   Image* = ref object of UI
     pos*: XY
