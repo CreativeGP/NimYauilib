@@ -20,9 +20,6 @@ proc update*(line: ui.Line) =
   return
 
 proc draw*(line: ui.Line, ren: sdl.Renderer) =
-  var
-    offsetx = 0
-    offsety = 0
   for i in 0..line.weight:
     discard ren.setRenderDrawColor(line.rgba.r, line.rgba.g, line.rgba.b, line.rgba.a)
     discard ren.renderDrawLine(line.pos[0].x.toInt + ((i+1) mod 2 - i mod 2) * (i/2).int, line.pos[0].y.toInt,
