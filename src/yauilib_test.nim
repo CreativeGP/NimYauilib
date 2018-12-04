@@ -9,13 +9,13 @@ import sdl2/sdl,
        sdl2/sdl_ttf as ttf,
        colors,
        os
-       
 
 import geo,
        ui,
        point,
        line,
-       color
+       color,
+       circle
 
 const
   Title = "Yauilib Test"
@@ -30,6 +30,11 @@ type
   AppObj = object
     window*: sdl.Window # Window pointer
     renderer*: sdl.Renderer # Rendering state pointer
+
+  FpsManager = ref FpsManagerObj
+  FpsManagerObj = object
+    counter, fps: int
+    timer: sdl.TimerID
 
 
 proc init(app: App): bool =
@@ -111,6 +116,38 @@ proc exit(app: App) =
   echo "SDL shutdown completed"
 
 
+
+##############
+# FPSMANAGER #
+##############
+
+# FPS timer
+# param is FpsManager casted to pointer
+proc fpsTimer(interval: uint32, param: pointer): uint32 {.cdecl.} =
+  let obj = cast[FpsManager](param)
+  obj.fps = obj.counter
+  obj.counter = 0
+  return interval
+
+
+proc newFpsManager(): FpsManager = FpsManager(counter: 0, fps: 0, timer: 0)
+
+
+proc free(obj: FpsManager) =
+  discard sdl.removeTimer(obj.timer)
+  obj.timer = 0
+
+
+proc fps(obj: FpsManager): int {.inline.} = return obj.fps
+
+
+proc start(obj: FpsManager) =
+  obj.timer = sdl.addTimer(1000, fpsTimer, cast[pointer](obj))
+
+
+proc count(obj: FpsManager) {.inline.} = inc(obj.counter)
+  
+
 ########
 # MAIN #
 ########
@@ -122,13 +159,22 @@ var
 
 if init(app):
   var
+#    fpsMgr = newFpsManager()
+#    delta = 0.0 # Time passed since last frame in seconds
+    ticks: uint64  = sdl.getPerformanceCounter()# Ticks counter
+    freq = sdl.getPerformanceFrequency() # Get counter frequency
+#    fpsLimiter = 60 # FPS limit value
+    
     font, outlinedFont: ttf.Font
     textColor = sdl.Color(r: 0xFF, g: 0xFF, b: 0xFF)
     bgColor = sdl.Color(r: 0x30, g: 0x30, b: 0x30)
     point = ui.Point(pos: XY(x:300, y:300), rgba: colorToRGBA(colBlue))
     line = ui.Line(pos: [XY(x:100, y:100), XY(x:0, y:0)], weight: 10, rgba: colorToRGBA(colGreen)).init
+    circle = ui.Circle(pos: XY(x:300, y:100), radius: 30, rgba: colorToRGBA(colPink)).init
     global_surface = createRGBSurface(0, 800, 600, 32, 0,0,0,0)
 
+#  fpsMgr.start()
+  
   font = ttf.openFont("assets/VeraMono.ttf", 16)
   if font == nil:
     sdl.logCritical(sdl.LogCategoryError,
@@ -162,6 +208,7 @@ if init(app):
 
     point.draw(app.renderer)
     line.draw(app.renderer)
+    circle.draw(app.renderer)
 
     # s = outlinedFont.renderUTF8_Blended("Outlined text", textColor)
     # discard app.renderer.render(s, 10, 150)
@@ -178,6 +225,23 @@ if init(app):
     app.renderer.renderPresent()
 
     done = events()
+
+#    fpsMgr.count()
+
+
+     # Limit FPS
+    let elapsed_ms = (sdl.getPerformanceCounter() - ticks).int * 1000 / freq.int
+    echo elapsed_ms
+    let spare = 16 - elapsed_ms.int
+    sdl.delay(1)
+    # if spare > 0:
+    #   sdl.delay(spare.uint32)
+
+    # Get frame duration
+    ticks = sdl.getPerformanceCounter()
+
+#  free(fpsMgr)
+  ttf.closeFont(font)
 
 # Shutdown
 exit(app)
